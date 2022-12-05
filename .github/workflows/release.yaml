@@ -95,7 +95,7 @@ jobs:
           echo "CLI Test (Linux) Status: ${{ steps.cli-linux.outputs.conclusion }}"
           false
 
-  release:
+  pre-release:
     needs: [quality-gate]
     # due to our code signing process, it's vital that we run our release steps on macOS
     runs-on: macos-latest
@@ -129,18 +129,40 @@ jobs:
         if: steps.tool-cache.outputs.cache-hit != 'true' || steps.go-cache.outputs.cache-hit != 'true'
         run: make bootstrap
 
-      - name: Build & publish release artifacts
-        run: make release
-        env:
-          GITHUB_TOKEN: ${{ secrets.ANCHORE_GIT_READ_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.TOOLBOX_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.TOOLBOX_AWS_SECRET_ACCESS_KEY }}
-          # used during macOS code signing
-          APPLE_DEVELOPER_ID_CERT: ${{ secrets.APPLE_DEVELOPER_ID_CERT }}
-          APPLE_DEVELOPER_ID_CERT_PASS: ${{ secrets.APPLE_DEVELOPER_ID_CERT_PASS }}
-          # used during macOS notarization
-          AC_USERNAME: ${{ secrets.ENG_CI_APPLE_ID }}
-          AC_PASSWORD: ${{ secrets.ENG_CI_APPLE_ID_PASS }}
+      - name: Pre-build
+        id: pre-build
+        run: |
+          echo "dist-dir=$(make get-dist-dir)" >> "$GITHUB_OUTPUT"
+          echo "syft-version=$(make get-syft-version)" >> "$GITHUB_OUTPUT"
+          make pre-build
+
+  release:
+    needs: [pre-release]  
+    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.2.0
+    with:
+      go-version: 1.18
+      config-file: .slsa-goreleaser-linux-amd64.yaml
+      evaluated-envs: "DIST_DIR:${{steps.pre-build.outputs.dist-dir}}, SYFT_VERSION:${{steps.pre-build.outputs.syft-version}}"
+
+  post-release:
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post-release
+        run: make post-release
+
+      # - name: Build & publish release artifacts
+      #   run: make release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.ANCHORE_GIT_READ_TOKEN }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.TOOLBOX_AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.TOOLBOX_AWS_SECRET_ACCESS_KEY }}
+      #     # used during macOS code signing
+      #     APPLE_DEVELOPER_ID_CERT: ${{ secrets.APPLE_DEVELOPER_ID_CERT }}
+      #     APPLE_DEVELOPER_ID_CERT_PASS: ${{ secrets.APPLE_DEVELOPER_ID_CERT_PASS }}
+      #     # used during macOS notarization
+      #     AC_USERNAME: ${{ secrets.ENG_CI_APPLE_ID }}
+      #     AC_PASSWORD: ${{ secrets.ENG_CI_APPLE_ID_PASS }}
 
       - uses: anchore/sbom-action@06e109483e6aa305a2b2395eabae554e51530e1d # v0.13.1
         continue-on-error: true

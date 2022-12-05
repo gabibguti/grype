@@ -278,6 +278,27 @@ validate-grype-test-config:
 validate-syft-release-version:
 	@./.github/scripts/syft-released-version-check.sh
 
+.PHONY: get-dist-dir
+get-dist-dir:
+	echo $(DISTDIR)	
+
+.PHONY: get-syft-version
+get-syft-version:
+	echo $(SYFT_VERSION)
+
+.PHONY: pre-build
+pre-build: clean-dist CHANGELOG.md  ## Build and publish final binaries and packages. Intended to be run only on macOS.
+	$(call title,Pre build)
+
+	rm -f .github/scripts/apple-signing/log/*.txt
+
+.PHONY: post-release
+post-release: 
+	cat .github/scripts/apple-signing/log/*.txt
+
+	# upload the version file that supports the application version update check (excluding pre-releases)
+	.github/scripts/update-version-file.sh "$(DISTDIR)" "$(VERSION)"
+
 .PHONY: release
 release: clean-dist CHANGELOG.md  ## Build and publish final binaries and packages. Intended to be run only on macOS.
 	$(call title,Publishing release artifacts)

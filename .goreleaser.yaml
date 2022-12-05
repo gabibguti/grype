@@ -7,6 +7,7 @@ before:
     - ./.github/scripts/apple-signing/setup.sh {{ .IsSnapshot }}
 
 builds:
+  # LINUX BUILDS = 4
   - id: linux-build
     binary: grype
     goos:
@@ -30,6 +31,7 @@ builds:
       -X github.com/anchore/grype/internal/version.buildDate={{.Date}}
       -X github.com/anchore/grype/internal/version.gitDescription={{.Summary}}
 
+  # DARWIN BUILD = 2
   - id: darwin-build
     binary: grype
     goos:
@@ -46,6 +48,7 @@ builds:
         # a post-build hook has the advantage of not needing to unpackage and repackage a tar.gz with a signed binary
         - ./.github/scripts/apple-signing/sign.sh "{{ .Path }}" "{{ .IsSnapshot }}" "{{ .Target }}"
 
+  # WINDOWS BUILDS = 1
   - id: windows-build
     binary: grype
     goos:
@@ -55,6 +58,7 @@ builds:
     mod_timestamp: *build-timestamp
     env: *build-env
     ldflags: *build-ldflags
+
 
 archives:
   - id: linux-archives
