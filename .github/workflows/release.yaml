@@ -137,8 +137,8 @@ jobs:
       - name: Other
         run: |
           make pre-build
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     needs: [pre-release]
