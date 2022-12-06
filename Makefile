@@ -280,11 +280,11 @@ validate-syft-release-version:
 
 .PHONY: get-dist-dir
 get-dist-dir:
-	echo $(DISTDIR)	
+	echo "$(DISTDIR)"
 
 .PHONY: get-syft-version
 get-syft-version:
-	echo $(SYFT_VERSION)
+	echo "$(SYFT_VERSION)"
 
 .PHONY: pre-build
 pre-build: clean-dist CHANGELOG.md  ## Build and publish final binaries and packages. Intended to be run only on macOS.
