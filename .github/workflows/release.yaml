@@ -129,9 +129,12 @@ jobs:
         if: steps.tool-cache.outputs.cache-hit != 'true' || steps.go-cache.outputs.cache-hit != 'true'
         run: make bootstrap
 
-      - name: Pre-build
+      - name: Getting Makefile vars
         run: |
           echo "dist-dir=$(make get-dist-dir)" >> "$GITHUB_OUTPUT"
+        
+      - name: Other
+        run: |
           echo "syft-version=$(make get-syft-version)" >> "$GITHUB_OUTPUT"
           make pre-build
 
