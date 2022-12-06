@@ -131,8 +131,8 @@ jobs:
 
       - name: Pre-build
         run: |
-          echo "dist-dir=$(make get-dist-dir)" >> "$GITHUB_OUTPUT"
-          echo "syft-version=$(make get-syft-version)" >> "$GITHUB_OUTPUT"
+          echo "dist-dir='$(make get-dist-dir)'" >> "$GITHUB_OUTPUT"
+          echo "syft-version='$(make get-syft-version)'" >> "$GITHUB_OUTPUT"
           make pre-build
 
   release:
