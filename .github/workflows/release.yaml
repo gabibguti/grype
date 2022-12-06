@@ -134,11 +134,11 @@ jobs:
           echo "dist-dir=$(make get-dist-dir)" >> "$GITHUB_OUTPUT"
           echo "syft-version=$(make get-syft-version)" >> "$GITHUB_OUTPUT"
         
-      - name: Other
-        run: |
-          make pre-build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Other
+      #   run: |
+      #     make pre-build
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     needs: [pre-release]
