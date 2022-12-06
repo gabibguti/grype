@@ -132,11 +132,13 @@ jobs:
       - name: Getting Makefile vars
         run: |
           echo "dist-dir=$(make get-dist-dir)" >> "$GITHUB_OUTPUT"
+          echo "syft-version=$(make get-syft-version)" >> "$GITHUB_OUTPUT"
         
       - name: Other
         run: |
-          echo "syft-version=$(make get-syft-version)" >> "$GITHUB_OUTPUT"
           make pre-build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     needs: [pre-release]
