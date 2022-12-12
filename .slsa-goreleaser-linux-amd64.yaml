@@ -28,7 +28,7 @@ dist: "{{.Env.DIST_DIR}}"
 # Binary output name.
 # {{ .Os }} will be replaced by goos field in the config file.
 # {{ .Arch }} will be replaced by goarch field in the config file.
-binary: grype
+binary: ./artifacts/grype
 
 # (Optional) ldflags generated dynamically in the workflow, and set as the `evaluated-envs` input variables in the workflow.
 ldflags:
